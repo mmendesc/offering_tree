@@ -12,7 +12,7 @@ class PayRatesController < ApplicationController
   end
 
   def pay_amount
-    amount = PayRates::CalculatePayAmount.new.call(pay_rate, params[:clients])
+    amount = PayRates::CalculatePayAmount.new.call(pay_rate, params[:clients].to_i)
 
     render json: { amount: amount }
   end
