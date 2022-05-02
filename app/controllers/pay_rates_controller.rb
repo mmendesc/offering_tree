@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class PayRatesController < ApplicationController
+  rescue_from(
+    ActiveRecord::RecordInvalid,
+    ActiveRecord::NotNullViolation
+    ) do |exception|
+    render_errors(:unprocessable_entity, exception)
+  end
+
   def create
     PayRates::Create.new.call(pay_rate_params)
 
@@ -8,7 +15,9 @@ class PayRatesController < ApplicationController
   end
 
   def update
-    pay_rate.update(pay_rate_params)
+    PayRates::Update.new.call(pay_rate, pay_rate_params)
+
+    head :ok
   end
 
   def pay_amount

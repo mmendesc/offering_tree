@@ -67,17 +67,16 @@ RSpec.describe '/pay_rates/', type: :request do
       }
     end
 
-    let(:calculate_double) { instance_double(PayRates::CalculatePayAmount.to_s) }
+    let(:update_double) { instance_double(PayRates::Update.to_s, call: true) }
 
     before do
-      allow(PayRate).to receive(:find).and_return(pay_rate)
-      allow(pay_rate).to receive(:update)
+      allow(PayRates::Update).to receive(:new).and_return(update_double)
     end
 
     it 'updates the pay rate' do
       update_pay_rate
 
-      expect(pay_rate).to have_received(:update).with(ActionController::Parameters.new(params[:pay_rate]).permit!)
+      expect(update_double).to have_received(:call).with(pay_rate, ActionController::Parameters.new(params[:pay_rate]).permit!)
     end
   end
 end

@@ -10,7 +10,8 @@ RSpec.describe PayRates::Create do
     let(:params) do
       {
         rate_name_char: name,
-        base_rate_per_client: 5.00
+        base_rate_per_client: 5.00,
+        pay_rate_bonus_attributes: {}
       }
     end
 
@@ -73,7 +74,7 @@ RSpec.describe PayRates::Create do
       end
 
       it 'does not creates a pay rate' do
-        expect { create_pay_rate }.to raise_error(ActiveRecord::NotNullViolation)
+        expect { create_pay_rate }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
