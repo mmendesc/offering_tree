@@ -25,7 +25,8 @@ RSpec.describe PayRates::Create do
           base_rate_per_client: 5.00,
           pay_rate_bonus_attributes: {
             rate_per_client: 3.00,
-            min_client_count: 25
+            min_client_count: 25,
+            max_client_count: 40
           }
         }
       end

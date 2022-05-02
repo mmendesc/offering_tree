@@ -20,7 +20,7 @@ module PayRates
     def bonus_amount
       return 0 unless pay_rate_bonus
       return 0 if min_clients && num_clients < min_clients
-      return (max_clients - num_clients) * pay_rate_bonus.rate_per_client if max_clients
+      return (max_clients - min_clients) * pay_rate_bonus.rate_per_client if max_clients && num_clients > max_clients
 
       (num_clients - min_clients) * pay_rate_bonus.rate_per_client
     end
