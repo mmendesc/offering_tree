@@ -30,7 +30,7 @@ module PayRates
     end
 
     def min_clients
-      pay_rate_bonus.min_client_count
+      pay_rate_bonus.min_client_count || 0
     end
 
     def max_clients

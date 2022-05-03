@@ -15,9 +15,10 @@ RSpec.describe PayRates::CalculatePayAmount do
 
     context 'when has a payment rate bonus' do
       let(:num_clients) { 30 }
+      let(:min_client_count) { 25 }
 
       before do
-        create(:pay_rate_bonus, min_client_count: 25, max_client_count: 40, pay_rate: pay_rate)
+        create(:pay_rate_bonus, min_client_count: min_client_count, max_client_count: 40, pay_rate: pay_rate)
       end
 
       it 'returns the total amount to be paid' do
@@ -37,6 +38,14 @@ RSpec.describe PayRates::CalculatePayAmount do
 
         it 'returns the total amount to be paid' do
           expect(calculate_amount).to eq 270.0
+        end
+      end
+
+      context 'when has only a max client limitation' do
+        let(:min_client_count) { nil }
+
+        it 'returns the total amount to be paid' do
+          expect(calculate_amount).to eq 240.0
         end
       end
     end
