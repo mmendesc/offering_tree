@@ -10,22 +10,28 @@ module Api
         render_errors(:unprocessable_entity, exception)
       end
 
-      def create
-        PayRates::Create.new.call(pay_rate_params)
+      rescue_from(ActionController::ParameterMissing) do |exception|
+        render_errors(:bad_request, exception)
+      end
 
-        head :created
+      def create
+        pay_rate = PayRates::Create.new.call(pay_rate_params)
+
+        render json: ::Api::V1::PayRateSerializer.new(pay_rate)
       end
 
       def update
-        PayRates::Update.new.call(pay_rate, pay_rate_params)
+        updated_pay_rate = PayRates::Update.new.call(pay_rate, pay_rate_params)
 
-        head :ok
+        render json: ::Api::V1::PayRateSerializer.new(updated_pay_rate)
       end
 
       def pay_amount
-        amount = PayRates::CalculatePayAmount.new.call(pay_rate, params[:clients].to_i)
+        amount = PayRates::CalculatePayAmount.new.call(pay_rate, clients.to_i)
 
-        render json: { amount: amount }
+        amount_struct = OpenStruct.new(amount: amount, id: pay_rate_id, clients: clients.to_i)
+
+        render json: ::Api::V1::AmountSerializer.new(amount_struct)
       end
 
       private
@@ -36,6 +42,10 @@ module Api
 
       def pay_rate_id
         params.require(:id)
+      end
+
+      def clients
+        params.require(:clients)
       end
 
       def pay_rate_params

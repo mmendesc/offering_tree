@@ -9,6 +9,8 @@ module PayRates
       sanitize_pay_rate_bonus_attributes
 
       update_pay_rate
+
+      pay_rate
     end
 
     private

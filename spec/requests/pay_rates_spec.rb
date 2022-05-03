@@ -16,7 +16,8 @@ RSpec.describe '/pay_rates/', type: :request do
         }
       }
     end
-    let(:create_double) { instance_double(PayRates::Create.to_s, call: true) }
+    let(:pay_rate) { create(:pay_rate) }
+    let(:create_double) { instance_double(PayRates::Create.to_s, call: pay_rate) }
 
     before do
       allow(PayRates::Create).to receive(:new).and_return(create_double)
@@ -26,6 +27,23 @@ RSpec.describe '/pay_rates/', type: :request do
       create_pay_rate
 
       expect(create_double).to have_received(:call).with(ActionController::Parameters.new(params[:pay_rate]).permit!)
+    end
+
+    context 'when request is missing params' do
+      let(:params) do
+        {
+          pay_rate2: {
+            rate_name_char: name,
+            base_rate_per_client: '5.00'
+          }
+        }
+      end
+
+      it 'return 400 status code' do
+        create_pay_rate
+
+        expect(response).to have_http_status(:bad_request)
+      end
     end
   end
 
@@ -67,7 +85,7 @@ RSpec.describe '/pay_rates/', type: :request do
       }
     end
 
-    let(:update_double) { instance_double(PayRates::Update.to_s, call: true) }
+    let(:update_double) { instance_double(PayRates::Update.to_s, call: pay_rate) }
 
     before do
       allow(PayRates::Update).to receive(:new).and_return(update_double)
