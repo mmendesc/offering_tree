@@ -6,7 +6,7 @@ RSpec.describe '/pay_rates/', type: :request do
   describe 'POST /pay_rates' do
     subject(:create_pay_rate) { post endpoint, params: params }
 
-    let(:endpoint) { '/pay_rates' }
+    let(:endpoint) { '/api/v1/pay_rates' }
     let(:name) { 'Rate name' }
     let(:params) do
       {
@@ -29,10 +29,10 @@ RSpec.describe '/pay_rates/', type: :request do
     end
   end
 
-  describe 'GET /pay_rates/:id/pay_amount' do
+  describe 'GET /api/v1/pay_rates/:id/pay_amount' do
     subject(:get_amount) { get endpoint, params: params }
 
-    let(:endpoint) { "/pay_rates/#{pay_rate.id}/pay_amount" }
+    let(:endpoint) { "/api/v1/pay_rates/#{pay_rate.id}/pay_amount" }
     let(:pay_rate) { create(:pay_rate) }
     let(:params) do
       {
@@ -53,10 +53,10 @@ RSpec.describe '/pay_rates/', type: :request do
     end
   end
 
-  describe 'PUT /pay_rates/:id' do
+  describe 'PUT /api/v1/pay_rates/:id' do
     subject(:update_pay_rate) { put endpoint, params: params }
 
-    let(:endpoint) { "/pay_rates/#{pay_rate.id}" }
+    let(:endpoint) { "/api/v1/pay_rates/#{pay_rate.id}" }
     let(:pay_rate) { create(:pay_rate) }
     let(:params) do
       {

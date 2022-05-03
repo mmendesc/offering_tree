@@ -4,9 +4,13 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "articles#index"
 
-  resources :pay_rates, only: %i[create update] do
-    member do
-      get :pay_amount
+  namespace :api do
+    namespace :v1 do
+      resources :pay_rates, only: %i[create update] do
+        member do
+          get :pay_amount
+        end
+      end
     end
   end
 end
