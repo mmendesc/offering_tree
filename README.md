@@ -17,6 +17,7 @@ It should output this:
 
 
 ### Testing the API
+- Start the server with `rails s`, and run the following scenarios
  - Run this curl request from a console, Example 1
 ```
 curl --location --request GET 'localhost:3000/api/v1/pay_rates/1/pay_amount' \
