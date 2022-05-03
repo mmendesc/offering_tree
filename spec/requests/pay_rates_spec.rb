@@ -16,17 +16,78 @@ RSpec.describe '/pay_rates/', type: :request do
         }
       }
     end
-    let(:pay_rate) { create(:pay_rate) }
-    let(:create_double) { instance_double(PayRates::Create.to_s, call: pay_rate) }
-
-    before do
-      allow(PayRates::Create).to receive(:new).and_return(create_double)
-    end
 
     it 'call the create service' do
       create_pay_rate
 
-      expect(create_double).to have_received(:call).with(ActionController::Parameters.new(params[:pay_rate]).permit!)
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).deep_symbolize_keys).to include(
+        data: {
+          id: be_a(String),
+          type: 'pay_rate',
+          attributes: {
+            rate_name_char: name,
+            base_rate_per_client: 5.0,
+            min_client_count: nil,
+            max_client_count: nil,
+            rate_per_client: nil
+          }
+        }
+      )
+    end
+
+    context 'with a valid pay rate bonus' do
+      let(:params) do
+        {
+          pay_rate: {
+            rate_name_char: name,
+            base_rate_per_client: '5.00',
+            pay_rate_bonus_attributes: {
+              rate_per_client: 3.0,
+              min_client_count: 20
+            }
+          }
+        }
+      end
+
+      it 'create the pay rate and bonus' do
+        create_pay_rate
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body).deep_symbolize_keys).to include(
+          data: {
+            id: be_a(String),
+            type: 'pay_rate',
+            attributes: {
+              rate_name_char: name,
+              base_rate_per_client: 5.0,
+              min_client_count: 20,
+              max_client_count: nil,
+              rate_per_client: 3.0
+            }
+          }
+        )
+      end
+    end
+
+    context 'when pay rate bonus is invalid' do
+      let(:params) do
+        {
+          pay_rate: {
+            rate_name_char: name,
+            base_rate_per_client: '5.00',
+            pay_rate_bonus_attributes: {
+              rate_per_client: 3.0
+            }
+          }
+        }
+      end
+
+      it 'return 422 status code' do
+        create_pay_rate
+
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
     context 'when request is missing params' do
@@ -57,17 +118,35 @@ RSpec.describe '/pay_rates/', type: :request do
         clients: 30
       }
     end
-    let(:calculate_double) { instance_double(PayRates::CalculatePayAmount.to_s) }
-
-    before do
-      allow(PayRates::CalculatePayAmount).to receive(:new).and_return(calculate_double)
-      allow(calculate_double).to receive(:call)
-    end
 
     it 'calls the calculate service' do
       get_amount
 
-      expect(calculate_double).to have_received(:call).with(pay_rate, 30)
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).deep_symbolize_keys).to include(
+        data: {
+          id: pay_rate.id.to_s,
+          type: 'amount',
+          attributes: {
+            clients: params[:clients],
+            amount: 150.0
+          }
+        }
+      )
+    end
+
+    context 'when request is missing params' do
+      let(:params) do
+        {
+          clients2: 30
+        }
+      end
+
+      it 'return 400 status code' do
+        get_amount
+
+        expect(response).to have_http_status(:bad_request)
+      end
     end
   end
 
@@ -85,16 +164,37 @@ RSpec.describe '/pay_rates/', type: :request do
       }
     end
 
-    let(:update_double) { instance_double(PayRates::Update.to_s, call: pay_rate) }
-
-    before do
-      allow(PayRates::Update).to receive(:new).and_return(update_double)
-    end
-
     it 'updates the pay rate' do
       update_pay_rate
 
-      expect(update_double).to have_received(:call).with(pay_rate, ActionController::Parameters.new(params[:pay_rate]).permit!)
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).deep_symbolize_keys).to include(
+        data: {
+          id: pay_rate.id.to_s,
+          type: 'pay_rate',
+          attributes: {
+            rate_name_char: 'New Name',
+            base_rate_per_client: 4.0,
+            min_client_count: nil,
+            max_client_count: nil,
+            rate_per_client: nil
+          }
+        }
+      )
+    end
+
+    context 'when request is missing params' do
+      let(:params) do
+        {
+          clients2: 30
+        }
+      end
+
+      it 'return 400 status code' do
+        update_pay_rate
+
+        expect(response).to have_http_status(:bad_request)
+      end
     end
   end
 end
