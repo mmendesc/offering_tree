@@ -4,7 +4,7 @@ class PayRatesController < ApplicationController
   rescue_from(
     ActiveRecord::RecordInvalid,
     ActiveRecord::NotNullViolation
-    ) do |exception|
+  ) do |exception|
     render_errors(:unprocessable_entity, exception)
   end
 
